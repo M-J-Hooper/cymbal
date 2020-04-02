@@ -1,7 +1,8 @@
 pub mod literal;
 pub mod expr;
+pub mod ops;
 pub mod simplify;
-mod display;
+pub mod display;
 
 #[derive(Clone, Debug)]
 pub struct Error {

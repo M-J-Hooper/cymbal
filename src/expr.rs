@@ -42,10 +42,48 @@ pub enum Op {
     Mul,
 }
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn power() {
-        assert_eq!(2 + 2, 4);
+impl Op {
+    pub fn identity(&self) -> Complex {
+        let r = match *self {
+            Op::Add => num::Zero::zero(),
+            Op::Mul => num::One::one(),
+        };
+        Complex::new(r, num::Zero::zero())
+    }
+}
+
+impl Group {
+    pub fn add(members: Vec<Expr>) -> Self {
+        Group { op: Op::Add, members }
+    }
+
+    pub fn multiply(members: Vec<Expr>) -> Self {
+        Group { op: Op::Mul, members }
+    }
+
+    pub fn identity(op: &Op) -> Self {
+        let expr = Expr::Lit(op.identity());
+        Group { op: op.clone(), members: vec![expr] }
+    }
+}
+
+impl From<Complex> for Expr {
+    fn from(c: Complex) -> Self { 
+        Expr::Lit(c)
+    }
+}
+
+impl From<char> for Expr {
+    fn from(c: char) -> Self { 
+        Expr::Var(c)
+    }
+}
+
+impl From<Expr> for Group {
+    fn from(expr: Expr) -> Self { 
+        match expr {
+            Expr::Group(g) => g,
+            e => Group::multiply(vec![e]),
+        }
     }
 }
