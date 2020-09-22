@@ -14,7 +14,7 @@ impl fmt::Display for Expr {
 
 impl fmt::Display for Power {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({})^({})", self.expr, self.n)
+        write!(f, "{}^{}", self.expr, self.n)
     }
 }
 
@@ -35,18 +35,18 @@ mod tests {
 
     #[test]
     fn power() {
-        assert_eq!("(x)^(2)", (Expr::Var('x') ^ new_integer(2)).to_string());
+        assert_eq!("x^2", (Expr::Var('x') ^ new_integer(2)).to_string());
     }
 
     #[test]
     fn fractional_power() {
-        assert_eq!("(x)^(1/2)", (Expr::Var('x') ^ new_number(1, 2)).to_string());
+        assert_eq!("x^1/2", (Expr::Var('x') ^ new_number(1, 2)).to_string());
     }
 
     #[test]
     fn polynomial() {
         assert_eq!(
-            "(((x)^(2) + x) + 3)",
+            "((x^2 + x) + 3)",
             ((Expr::Var('x') ^ new_integer(2)) + 'x' + new_integer(3)).to_string()
         );
     }
