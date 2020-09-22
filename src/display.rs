@@ -14,7 +14,10 @@ impl fmt::Display for Expr {
 
 impl fmt::Display for Power {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}^{}", self.expr, self.n)
+        match *self.expr {
+            Expr::Pow(_) | Expr::Group(_) => write!(f, "({})^{}", self.expr, self.n),
+            _ => write!(f, "{}^{}", self.expr, self.n)
+        }
     }
 }
 
@@ -25,7 +28,24 @@ impl fmt::Display for Group {
             Op::Mul => ".",
         };
 
-        write!(f, "({} {} {})", self.left, delimeter, self.right)
+        let l_wrap = if let Expr::Group(g) = &*self.left {
+            g.op != self.op
+        } else {
+            false
+        };
+
+        let r_wrap = if let Expr::Group(g) = &*self.right {
+            g.op != self.op
+        } else {
+            false
+        };
+
+        match (l_wrap, r_wrap) {
+            (true, true) => write!(f, "({}) {} ({})", self.left, delimeter, self.right),
+            (true, false) => write!(f, "({}) {} {}", self.left, delimeter, self.right),
+            (false, true) => write!(f, "{} {} ({})", self.left, delimeter, self.right),
+            (false, false) => write!(f, "{} {} {}", self.left, delimeter, self.right),
+        }
     }
 }
 
@@ -46,7 +66,7 @@ mod tests {
     #[test]
     fn polynomial() {
         assert_eq!(
-            "((x^2 + x) + 3)",
+            "x^2 + x + 3",
             ((Expr::Var('x') ^ new_integer(2)) + 'x' + new_integer(3)).to_string()
         );
     }
@@ -54,7 +74,7 @@ mod tests {
     #[test]
     fn simple_multiplication() {
         assert_eq!(
-            "((3 . x) . y)",
+            "3 . x . y",
             (Expr::Lit(new_integer(3)) * 'x' * 'y').to_string()
         );
     }

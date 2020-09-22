@@ -40,7 +40,7 @@ mod tests {
     #[test]
     fn simple_multiply() {
         assert_eq!(
-            "((x . y) . z)".to_string(),
+            "x . y . z".to_string(),
             (Expr::Var('x') * Expr::Var('y') * Expr::Var('z')).to_string()
         );
     }

@@ -66,6 +66,8 @@ impl Simplify for Group {
         let expr = match (self.op, l, r) {
             (Op::Add, Expr::Lit(n), expr) | (Op::Add, expr, Expr::Lit(n)) if n.is_zero() => expr,
             (Op::Mul, Expr::Lit(n), expr) | (Op::Mul, expr, Expr::Lit(n)) if n.is_one() => expr,
+            (Op::Add, Expr::Lit(n), Expr::Lit(m)) => Expr::Lit(n + m),
+            (Op::Mul, Expr::Lit(n), Expr::Lit(m)) => Expr::Lit(n * m),
             (Op::Add, left, right) => Expr::Group(Group::add(left, right)),
             (Op::Mul, left, right) => Expr::Group(Group::multiply(left, right)),
         };
