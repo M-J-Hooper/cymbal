@@ -1,10 +1,4 @@
-use crate::{
-    expr::*,
-    literal::*,
-    Result,
-    Error,
-    ErrorKind,
-};
+use crate::{expr::*, literal::*, Error, ErrorKind, Result};
 use std::fmt;
 
 impl fmt::Display for Expr {
@@ -27,16 +21,11 @@ impl fmt::Display for Power {
 impl fmt::Display for Group {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let delimeter = match self.op {
-            Op::Add => " + ",
-            Op::Mul => " . "
+            Op::Add => "+",
+            Op::Mul => ".",
         };
-        
-        let s = self.members.iter()
-            .map(|m| m.to_string())
-            .collect::<Vec<String>>()
-            .join(delimeter);
 
-        write!(f, "({})", s)
+        write!(f, "({} {} {})", self.left, delimeter, self.right)
     }
 }
 
@@ -51,22 +40,22 @@ mod tests {
 
     #[test]
     fn fractional_power() {
-        assert_eq!("(x)^(1/2)", (Expr::Var('x') ^ new_rational(1, 2)).to_string());
+        assert_eq!("(x)^(1/2)", (Expr::Var('x') ^ new_number(1, 2)).to_string());
     }
 
     #[test]
     fn polynomial() {
         assert_eq!(
-            "((x)^(2) + x + 3+0i)", 
-            ((Expr::Var('x') ^ new_integer(2)) + 'x'.into() + new_complex(3, 0).into()).to_string()
+            "(((x)^(2) + x) + 3)",
+            ((Expr::Var('x') ^ new_integer(2)) + 'x' + new_integer(3)).to_string()
         );
     }
 
     #[test]
     fn simple_multiplication() {
         assert_eq!(
-            "(3-2i . x . y)", 
-            (Expr::Lit(new_complex(3, -2)) * 'x'.into() * 'y'.into()).to_string()
+            "((3 . x) . y)",
+            (Expr::Lit(new_integer(3)) * 'x' * 'y').to_string()
         );
     }
 }
